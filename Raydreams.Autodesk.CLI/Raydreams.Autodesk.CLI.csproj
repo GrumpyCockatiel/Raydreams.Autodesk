@@ -15,6 +15,7 @@
     <None Remove="raydreams.miniserver" />
     <None Remove="Data\" />
     <None Remove="CommandLineParser" />
+    <None Remove="Serializers\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
@@ -31,6 +32,7 @@
     <Folder Include="Logic\" />
     <Folder Include="Extensions\" />
     <Folder Include="Data\" />
+    <Folder Include="Serializers\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.Development.json">
