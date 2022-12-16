@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Raydreams.Autodesk.CLI.Data;
+using Raydreams.Autodesk.CLI.Extensions;
 using Raydreams.Autodesk.CLI.IO;
 using Raydreams.Autodesk.CLI.Logic;
 using Raydreams.Autodesk.CLI.Model;
@@ -61,26 +62,61 @@ namespace Raydreams.Autodesk.CLI
             //string? token = tokenMgr.GetTokenAsync().GetAwaiter().GetResult();
 
             // test getting a project tree
-            var projects = this.ListProjects(repo, acctID).GetAwaiter().GetResult();
+            //var projects = this.ListProjects(repo, acctID).GetAwaiter().GetResult();
+
+            this.GetProjectTree(repo, acctID, new ForgeID( this.Client.DefaultProjectID) );
 
             //Console.WriteLine(token);
             return 0;
         }
 
+        /// <summary></summary>
         protected void ListHubs( IDataManagerAPI repo )
         {
             var results1 = repo.ListHubs().GetAwaiter().GetResult();
         }
 
+        /// <summary></summary>
+        /// <param name="repo"></param>
+        /// <param name="acctID"></param>
+        /// <returns></returns>
         protected async Task<List<ProjectStub>> ListProjects( IDataManagerAPI repo, ForgeID acctID )
         {
-            return await repo.ListProjects( acctID );
+            var projs = await repo.ListProjects( acctID );
+
+            // write them all to a desktop file
+            DataFileWriter file = new DataFileWriter( Path.Combine(IOHelpers.DesktopPath, "projects.csv" ) ).Open();
+            file.WriteHeader(new string[] { "ID,Name,Root,Platform" });
+
+            projs.ForEach( p => {
+                var items = p.SerializeToList();
+                file.WriteValuesToLine(items);
+            });
+
+            return projs;
         }
 
-        protected void GetProjectTree( IDataManagerAPI repo, ForgeID acctID, ForgeID projID )
+        /// <summary></summary>
+        protected ForgeProject GetProjectTree( IDataManagerAPI repo, ForgeID acctID, ForgeID projID )
         {
             ProjectBuilder proj = new ProjectBuilder( repo );
-            var tree = proj.Build( new ForgeIDs( acctID, new ForgeID( "b.4fcf928a-f8be-4243-aff5-bbb56fd105d4" ) ) ).GetAwaiter().GetResult();
+            var built = proj.Build( new ForgeIDs( acctID, projID ) ).GetAwaiter().GetResult();
+
+            if ( built )
+            {
+                List<ProjectFile> files = proj.Project.Root.GetFiles();
+
+                DataFileWriter file = new DataFileWriter( Path.Combine( IOHelpers.DesktopPath, "files.csv" ) ).Open();
+
+                file.WriteHeader( new string[] { "ID,Name,Version,Last Modified" } );
+
+                files.ForEach( p => {
+                    string[] items = { p.ID, p.Name, p.Version.ToString(), p.LastModified.ToString()  };
+                    file.WriteValuesToLine( items );
+                } );
+            }
+
+            return proj.Project;
         }
     }
 }

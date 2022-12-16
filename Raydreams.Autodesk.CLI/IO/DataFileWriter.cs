@@ -10,15 +10,16 @@ namespace Raydreams.Autodesk.CLI.IO
 	/// <summary>Writes to a file</summary>
 	public class DataFileWriter
 	{
-		#region [ Fields ]
+        #region [ Fields ]
 
-		private string _filePath = null;
+        /// <summary>file lock</summary>
+        private readonly object _fileLock = new object();
 
-		private string _colDelim = ",";
+        private string _colDelim = ",";
 
-		private string _newline = null;
+		private string _newline = Environment.NewLine;
 
-		private string[] _headers = null;
+		private string[] _headers = new string[0];
 
 		private char _fieldChar = Char.MinValue;
 
@@ -28,17 +29,24 @@ namespace Raydreams.Autodesk.CLI.IO
 
 		/// <summary></summary>
 		/// <param name="path">Complete path including filename to write to</param>
-		public DataFileWriter( string path )
+		public DataFileWriter( FileInfo path )
 		{
-			this._filePath = path.Trim();
+			this.Path = path;
 		}
 
-		#endregion [ Constructors ]
+		/// <summary></summary>
+		/// <param name="path">Complete path including filename to write to</param>
+		public DataFileWriter(string path) : this( new FileInfo(path) )
+		{ }
 
-		#region [ Properties ]
+        #endregion [ Constructors ]
+
+        #region [ Properties ]
+
+        protected FileInfo Path { get; set; }
 
 		/// <summary></summary>
-		protected StreamWriter OutputStream { get; set; }
+		protected StreamWriter? OutputStream { get; set; }
 
 		/// <summary>String between each column</summary>
 		public string ColDelimitor
@@ -54,12 +62,6 @@ namespace Raydreams.Autodesk.CLI.IO
 			set { this._newline = value.Trim(); }
 		}
 
-		/// <summary>Get the path being written to</summary>
-		public string FilePath
-		{
-			get { return this._filePath; }
-		}
-
 		/// <summary>Field quote character to use if any</summary>
 		public char FieldQuoteChar
 		{
@@ -71,42 +73,20 @@ namespace Raydreams.Autodesk.CLI.IO
 
 		#region [ Methods ]
 
-		/// <summary>Static convenience method to delete a directory</summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		public static void DeleteDirectory( string path )
-		{
-			if ( !String.IsNullOrWhiteSpace( path ) && Directory.Exists( path ) )
-				Directory.Delete( path, true );
-		}
-
-		/// <summary>Static convenience method to create a directory</summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		public static DirectoryInfo CreateDirectory( string path )
-		{
-			if ( String.IsNullOrWhiteSpace( path ) )
-				return null;
-
-			return System.IO.Directory.CreateDirectory( path );
-		}
-
 		/// <summary>Open the output file</summary>
-		public bool Open()
+		public DataFileWriter Open()
 		{
-			FileInfo fi = new FileInfo( this.FilePath );
+			this.OutputStream = new StreamWriter( this.Path.FullName, false );
 
-			this.OutputStream = new StreamWriter( this.FilePath, false );
-
-			return ( this.OutputStream != null );
+			return this;
 		}
 
 		/// <summary>Writes the list of headers to the file</summary>
 		public int WriteHeader( IEnumerable<string> headers )
 		{
-			int cols = 0;
+            int cols = 0;
 
-			if ( headers == null )
+			if ( this.OutputStream == null || headers == null )
 				return cols;
 
 			// keep the headers for later
@@ -130,8 +110,11 @@ namespace Raydreams.Autodesk.CLI.IO
 			if ( !String.IsNullOrWhiteSpace( this.RowDelimitor ) )
 				sb.Append( this.RowDelimitor );
 
-			this.OutputStream.WriteLine( sb.ToString() );
-
+			lock( _fileLock )
+			{
+                this.OutputStream.WriteLine( sb.ToString() );
+            }
+			
 			return cols;
 		}
 
@@ -140,17 +123,23 @@ namespace Raydreams.Autodesk.CLI.IO
 		/// <returns></returns>
 		public void WriteRawLine( string line )
 		{
-			if ( line == null )
+			if ( this.OutputStream == null || line == null )
 				return;
 
-			this.OutputStream.WriteLine( line );
+			lock (_fileLock)
+			{
+				this.OutputStream.WriteLine(line);
+			}
 		}
 
 		/// <summary>Writes the given string list to a delimited line</summary>
 		/// <param name="values"></param>
 		public void WriteValuesToLine( IEnumerable<string> values )
 		{
-			StringBuilder sb = new StringBuilder();
+            if ( this.OutputStream == null || values.Count() < 0 )
+                return;
+
+            StringBuilder sb = new StringBuilder();
 
 			foreach ( string s in values )
 			{
@@ -165,7 +154,10 @@ namespace Raydreams.Autodesk.CLI.IO
 			if ( !String.IsNullOrWhiteSpace( this.RowDelimitor ) )
 				sb.Append( this.RowDelimitor );
 
-			this.OutputStream.WriteLine( sb.ToString() );
+			lock (_fileLock)
+			{
+				this.OutputStream.WriteLine(sb.ToString());
+			}
 		}
 
 		/// <summary>Close the file stream</summary>
@@ -173,8 +165,11 @@ namespace Raydreams.Autodesk.CLI.IO
 		{
 			if ( this.OutputStream != null )
 			{
-				this.OutputStream.Flush();
-				this.OutputStream.Close();
+				lock (_fileLock)
+				{
+					this.OutputStream.Flush();
+					this.OutputStream.Close();
+				}
 			}
 		}
 

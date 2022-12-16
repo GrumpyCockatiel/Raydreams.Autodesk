@@ -6,7 +6,7 @@ namespace Raydreams.Autodesk.CLI.Data
     /// <summary></summary>
     public interface IDataManagerAPI
     {
-        Task<APIResponse<ForgeDataCollection>> ListHubs();
+        Task<List<HubAccount>> ListHubs();
 
         Task<List<ProjectStub>> FilterProjects(ForgeID id, string nameFilter);
 
@@ -19,4 +19,3 @@ namespace Raydreams.Autodesk.CLI.Data
         Task<APIResponse<ForgeDataCollection>> GetFolderContents(ForgeID projectID, string folderID);
     }
 }
-

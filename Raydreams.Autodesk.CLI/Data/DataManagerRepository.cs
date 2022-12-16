@@ -60,11 +60,18 @@ namespace Raydreams.Autodesk.CLI.Data
         /// GET (data:read) user context optional
         /// The user will see ANY hubs they have ANY access to
         /// </remarks>
-        public async Task<APIResponse<ForgeDataCollection>> ListHubs()
+        public async Task<List<HubAccount>> ListHubs()
         {
+            List<HubAccount> results = new List<HubAccount>();
+
             string path = $"project/v1/hubs";
 
-            return await GetRequest<ForgeDataCollection>(path, true);
+            var resp = await GetRequest<ForgeDataCollection>(path, true);
+
+            if ( resp.IsSuccess && resp.Data != null && resp.Data.Result != null )
+                resp.Data.Result.ForEach( h => results.Add( new HubAccount( h ) ) );
+
+            return results;
         }
 
         /// <summary>Gets all the projects </summary>

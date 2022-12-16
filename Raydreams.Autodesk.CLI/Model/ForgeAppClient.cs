@@ -50,6 +50,10 @@ namespace Raydreams.Autodesk.CLI.Model
         [JsonProperty("primaryHubID")]
         public string? PrimaryHubID { get; set; }
 
+        /// <summary>The default project to try and use</summary>
+        [JsonProperty( "defaultProjectID" )]
+        public string? DefaultProjectID { get; set; }
+
         /// <summary>Contact email</summary>
         [JsonProperty("ownerEmail")]
         public string? OwnerEmail { get; set; }

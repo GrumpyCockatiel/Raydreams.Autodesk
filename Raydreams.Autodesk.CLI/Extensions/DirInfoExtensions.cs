@@ -8,9 +8,29 @@ namespace Raydreams.Autodesk.CLI.Extensions
 	/// <summary>Directory Info Extensions</summary>
 	public static class DirInfoExtensions
 	{
-		/// <summary>Given just the parent directory path and full file path, returns JUST the part of the path after the project directory name including the file name. No root folder or project name is included.</summary>
-		/// <returns></returns>
-		public static string PathDiff( this DirectoryInfo dir, FileInfo fi)
+        /// <summary>Static convenience method to delete a directory</summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static void DeleteDirectory( string path )
+        {
+            if ( !String.IsNullOrWhiteSpace( path ) && Directory.Exists( path ) )
+                Directory.Delete( path, true );
+        }
+
+        /// <summary>Static convenience method to create a directory</summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static DirectoryInfo CreateDirectory( string path )
+        {
+            if ( String.IsNullOrWhiteSpace( path ) )
+                return null;
+
+            return System.IO.Directory.CreateDirectory( path );
+        }
+
+        /// <summary>Given just the parent directory path and full file path, returns JUST the part of the path after the project directory name including the file name. No root folder or project name is included.</summary>
+        /// <returns></returns>
+        public static string PathDiff( this DirectoryInfo dir, FileInfo fi)
 		{
 			int begin = fi.FullName.IndexOf( dir.FullName, StringComparison.InvariantCultureIgnoreCase );
 

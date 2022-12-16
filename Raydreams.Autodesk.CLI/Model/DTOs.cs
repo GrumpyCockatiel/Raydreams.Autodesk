@@ -1,6 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Raydreams.Autodesk.CLI.Extensions;
 using Raydreams.Autodesk.CLI.Serializers;
 
 namespace Raydreams.Autodesk.CLI.Model
@@ -19,18 +20,29 @@ namespace Raydreams.Autodesk.CLI.Model
     /// <summary>A DTO tuple of basic Hub Account Information</summary>
     public class HubAccount
     {
+        public HubAccount()
+        { }
+
+        public HubAccount( ForgeObject acct )
+        {
+            ID = new ForgeID( acct.ID );
+            Name = acct.Attributes.GetName;
+            Type = acct.Attributes.Extension.Type;
+            Region = acct.Attributes.Region.GetEnumValue<RegionCode>(RegionCode.US, true);
+        }
+
         /// <summary>The Name of the Hub/Account</summary>
         [JsonProperty( "name" )]
-        public string Name { get; set; }
+        public string Name { get; set; } = String.Empty;
 
         /// <summary>The ID of the Hub/Account</summary>
-        [JsonProperty( "id" )]
-        [JsonConverter( typeof( ForgeIDConverter ) )]
-        public ForgeID ID { get; set; }
+        [JsonProperty("id")]
+        [JsonConverter(typeof(ForgeIDConverter))]
+        public ForgeID ID { get; set; } = new ForgeID(Guid.Empty);
 
-        /// <summary>What type of hub like BIM360 or Core</summary>
-        [JsonProperty( "type" )]
-        public string Type { get; set; }
+        /// <summary>The type of Account BIM360 or Core</summary>
+        [JsonProperty("type")]
+        public string Type { get; set; } = "core";
 
         /// <summary>What region is the Hub in</summary>
         [JsonProperty( "region" )]

@@ -13,7 +13,7 @@ namespace Raydreams.Autodesk.CLI.Model
         /// <summary>Init with a single URN ID which will be parsed</summary>
         /// <param name="urnID"></param>
         /// <param name="name">Setting the name is optional</param>
-        public ObjectIDs( string urnID, string name = null )
+        public ObjectIDs( string urnID, string? name = null )
         {
             if ( String.IsNullOrWhiteSpace( urnID ) || !urnID.StartsWith( "urn:", StringComparison.InvariantCultureIgnoreCase ) )
                 throw new System.ArgumentNullException( "URN ID required", nameof( urnID ) );
@@ -31,7 +31,7 @@ namespace Raydreams.Autodesk.CLI.Model
             this.BucketKey = ids[0];
             this.ObjectKey = ids[1];
 
-            this.Name = !String.IsNullOrWhiteSpace( name ) ? name.Trim() : null;
+            this.Name = name?.Trim();
         }
 
         /// <summary>The Object's Bucket key</summary>
@@ -47,7 +47,7 @@ namespace Raydreams.Autodesk.CLI.Model
         /// <summary>The friendly name of the item</summary>
         /// <remarks>Does not have to be assigned to be valid</remarks>
         [JsonProperty( "name" )]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>Test for valid IDs</summary>
         public bool IsValid => !new string[] { this.BucketKey, this.ObjectKey }.IsAnyNullOrWhiteSpace();
