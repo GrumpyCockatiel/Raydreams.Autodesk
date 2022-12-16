@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Raydreams.Autodesk.CLI.Data;
@@ -48,7 +49,7 @@ namespace Raydreams.Autodesk.CLI
             AuthenticationManager authMgr = new AuthenticationManager(this.Client);
             authMgr.Scopes = ForgeScopes.UserRead | ForgeScopes.UserProfileRead | ForgeScopes.AccountRead | ForgeScopes.DataRead;
 
-            ForgeID acctID = new ForgeID( this.Client.PrimaryHubID);
+            ForgeIDs ids = new ForgeIDs( this.Client.PrimaryHubID, this.Client.DefaultProjectID );
 
             string tokenPath = Path.Combine( IOHelpers.DesktopPath, "tokens", "autodesk.txt" );
             //HTTPTokenManager tokenMgr = new HTTPTokenManager(authMgr, tokenPath, 50001);
@@ -61,19 +62,39 @@ namespace Raydreams.Autodesk.CLI
 
             //string? token = tokenMgr.GetTokenAsync().GetAwaiter().GetResult();
 
+            // test getting all the hubs
+            this.ListHubs(repo).GetAwaiter().GetResult();
+
             // test getting a project tree
             //var projects = this.ListProjects(repo, acctID).GetAwaiter().GetResult();
+            var dir = this.GetProjectTree(repo, ids.Account, ids.Project );
 
-            this.GetProjectTree(repo, acctID, new ForgeID( this.Client.DefaultProjectID) );
+            List<ProjectFile> files = dir.Root.GetFiles();
+
+            // test downloading the first file
+            var meta = repo.GetItemMetadata(ids.Project, files[0].ID).GetAwaiter().GetResult();
+            Relationship storage = meta.Data?.Included[meta.Data.Included.Count - 1].Relationships.Storage;
+
+            // storage will be null if the user does not have access to DL
+            var storageID = storage?.Data?.ID;
+
+            var obj = new ObjectIDs( storageID, files[0].Name );
+
+            var dlLink = repo.GetS3DownloadLink(obj).GetAwaiter().GetResult();
+            repo.DownloadObject(dlLink.Data, Path.Combine( IOHelpers.DesktopPath, files[0].Name ) ).GetAwaiter().GetResult();
 
             //Console.WriteLine(token);
             return 0;
         }
 
         /// <summary></summary>
-        protected void ListHubs( IDataManagerAPI repo )
+        protected async Task<List<HubAccount>> ListHubs( IDataManagerAPI repo )
         {
-            var results1 = repo.ListHubs().GetAwaiter().GetResult();
+            var hubs = await repo.ListHubs();
+
+            hubs.ForEach(h => Console.WriteLine($"[{h.ID}] {h.Name}"));
+
+            return hubs;
         }
 
         /// <summary></summary>
@@ -104,14 +125,14 @@ namespace Raydreams.Autodesk.CLI
 
             if ( built )
             {
-                List<ProjectFile> files = proj.Project.Root.GetFiles();
+                List<ProjectItem> items = proj.Project.Root.ToList(false);
 
                 DataFileWriter file = new DataFileWriter( Path.Combine( IOHelpers.DesktopPath, "files.csv" ) ).Open();
 
-                file.WriteHeader( new string[] { "ID,Name,Version,Last Modified" } );
+                file.WriteHeader( new string[] { "ID,Name,Depth,Last Modified" } );
 
-                files.ForEach( p => {
-                    string[] items = { p.ID, p.Name, p.Version.ToString(), p.LastModified.ToString()  };
+                items.ForEach( p => {
+                    string[] items = { p.ID, p.Name, p.Depth.ToString(), p.LastModified.ToString()  };
                     file.WriteValuesToLine( items );
                 } );
             }

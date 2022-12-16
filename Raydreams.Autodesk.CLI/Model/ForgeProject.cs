@@ -53,7 +53,7 @@ namespace Raydreams.Autodesk.CLI.Model
         /// <summary>The top level root folder</summary>
         /// <remarks>Name is usually like <GUID>-root-folder</remarks>
         [JsonProperty( PropertyName = "root", Order = 10 )]
-        public ProjectFolder Root { get; set; } = null;
+        public ProjectFolder Root { get; set; }
 
         /// <summary>The date the project was last modified</summary>
         /// <remarks>Inited to MaxValue otherwise ACC projects will always be stale </remarks>

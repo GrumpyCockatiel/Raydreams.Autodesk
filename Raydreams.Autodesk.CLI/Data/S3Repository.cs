@@ -30,8 +30,9 @@ namespace Raydreams.Autodesk.CLI.Data
 		}
 
 		/// <summary>Download an item using S3</summary>
-		/// <param name="signedURL"></param>
-		/// <returns></returns>
+		/// <param name="signedURL">S3 file URL</param>
+		/// <param name="fullPath">Path to download to locally</param>
+		/// <returns>File details as the file is downloaded to the path</returns>
 		/// <remarks>Signed URLs have to begin within 2 minutes of getting the URL</remarks>
 		public async Task<APIResponse<RawFileWrapper>> DownloadObject( S3SignedDownload signedURL, string fullPath )
 		{

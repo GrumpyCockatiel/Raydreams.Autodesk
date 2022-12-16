@@ -63,7 +63,6 @@ namespace Raydreams.Autodesk.CLI.Model
         public DateTimeOffset Created { get; set; } = DateTimeOffset.UtcNow;
 
         #endregion [ Properties ]
-
     }
 }
 

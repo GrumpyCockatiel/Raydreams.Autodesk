@@ -219,13 +219,13 @@ namespace Raydreams.Autodesk.CLI.Extensions
         }
 
         /// <summary>Convenience method to call on a Project object instead of the root</summary>
-  //      public static Dictionary<string, ProjectItem> IndexByID( BIMProject start )
-		//{
-  //          if ( start == null )
-  //              return new Dictionary<string, ProjectItem>();
+        public static Dictionary<string, ProjectItem> IndexByID( this ForgeProject start )
+        {
+            if (start == null)
+                return new Dictionary<string, ProjectItem>();
 
-  //          return start.Root.IndexByID();
-		//}
+            return start.Root.IndexByID();
+        }
 
         /// <summary>Does a tree walk and creates an index by item ID on every item</summary>
         /// <param name="start">HubProject to start the walk from</param>

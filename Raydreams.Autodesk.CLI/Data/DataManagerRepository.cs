@@ -187,6 +187,21 @@ namespace Raydreams.Autodesk.CLI.Data
             return await GetRequest<ForgeDataCollection>( path, true );
         }
 
+        /// <summary>Get the detailed metadata on a single item. Use ListItems for multiple items</summary>
+        /// <remarks>GET (data:read) user context optional
+        /// Will return Forbidden 403 if you try to use on a folder you dont have rights to
+        /// </remarks>
+        public async Task<APIResponse<ForgeData>> GetItemMetadata(ForgeID projectID, string itemID)
+        {
+
+            if (!projectID.IsValid || String.IsNullOrWhiteSpace(itemID))
+                return new APIResponse<ForgeData>() { StatusCode = HttpStatusCode.BadRequest };
+
+            string path = $"data/v1/projects/{projectID.DM}/items/{itemID.Trim()}?includePathInProject=true";
+
+            return await GetRequest<ForgeData>(path, true);
+        }
+
     }
 }
 
