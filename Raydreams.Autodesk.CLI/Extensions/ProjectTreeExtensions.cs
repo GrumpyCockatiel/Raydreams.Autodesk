@@ -15,7 +15,6 @@ namespace Raydreams.Autodesk.CLI.Extensions
         /// <summary>The fullname or prefix of a special folder that is often excluded</summary>
         public static readonly string[] SpecialFolders = new string[] { "submittals-attachments", "checklist_", "dailylog_", "issue_", "ProjectTb", "COST Root Folder" };
 
-
         public const string RootFolder = "root-folder";
 
         #endregion [ Fields ]

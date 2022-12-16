@@ -67,7 +67,7 @@ namespace Raydreams.Autodesk.CLI.Data
             return await GetRequest<ForgeDataCollection>(path, true);
         }
 
-        /// <summary>Gets all the projects in the sepcified Hub the token can access</summary>
+        /// <summary>Gets all the projects </summary>
         /// <param name="hubID">Hub/Account to get projects from</param>
         /// <param name="nameFilter">A CASE sensitive name contains filter. Use null to get 200 projects</param>
         /// <returns>A max of 200 matching projects</returns>
@@ -76,26 +76,67 @@ namespace Raydreams.Autodesk.CLI.Data
         /// filter on array of project IDs somehow
         /// ?page[number]=1&page[limit]=2
         /// </remarks>
-        public async Task<APIResponse<ForgeDataCollection>> ListProjects( ForgeID id, string? nameFilter = null )
+        public async Task<List<ProjectStub>> FilterProjects( ForgeID id, string nameFilter )
         {
-            if ( !id.IsValid )
-                return new APIResponse<ForgeDataCollection>() { StatusCode = HttpStatusCode.BadRequest };
+            List<ProjectStub> results = new List<ProjectStub>();
 
-            StringBuilder path = new StringBuilder( $"project/v1/hubs/{id.DM}/projects" );
+            if ( !id.IsValid || !String.IsNullOrWhiteSpace( nameFilter ) )
+                return results;
 
-            // apply the filter as a parameter
-            if ( !String.IsNullOrWhiteSpace( nameFilter ) )
+            // consider a min filter length here
+            if ( nameFilter.Length < 3 )
+                return results;
+
+            nameFilter = nameFilter.Trim();
+
+            string path = $"project/v1/hubs/{id.DM}/projects?filter[name]-contains={nameFilter}";
+            
+            APIResponse<ForgeDataCollection> resp = await GetRequest<ForgeDataCollection>( path, true );
+
+            if ( resp.IsSuccess && resp.Data != null && resp.Data.Result != null )
+                resp.Data.Result.ForEach( p => results.Add( new ProjectStub( p ) ) );
+
+            return results;
+        }
+
+        /// <summary>Gets all the projects in a hub</summary>
+        /// <param name="hubID">The account ID</param>
+        /// <param name="allStatuses">There's no status property in DM</param>
+        /// <returns></returns>
+        public async Task<List<ProjectStub>> ListProjects( ForgeID hubID )
+        {
+            int limit = 200;
+
+            // valiadate the input
+            if ( !hubID.IsValid )
+                return new List<ProjectStub>();
+
+            int page = 0;
+
+            APIResponse<ForgeDataCollection> resp = null;
+            List<ProjectStub> results = new List<ProjectStub>();
+
+            // limit to MaxLoops * 100 projects
+            do
             {
-                // consider a min filter length here
-                if ( nameFilter.Length < 3 )
-                    return new APIResponse<ForgeDataCollection>() { Data = new ForgeDataCollection() };
+                // format the path
+                string path = $"project/v1/hubs/{hubID.DM}/projects?page[number]={page}&page[limit]={limit}";
 
-                nameFilter = nameFilter.Trim();
-                string filter = $"?filter[name]-contains={nameFilter}";
-                path.Append( filter );
-            }
+                resp = await GetRequest<ForgeDataCollection>( path, true );
 
-            return await GetRequest<ForgeDataCollection>( path.ToString(), true );
+                if ( resp.IsSuccess && resp.Data != null && resp.Data.Result != null )
+                {
+                    resp.Data.Result.ForEach(p => results.Add(new ProjectStub(p)));
+                }
+
+                // uptick
+                ++page;
+
+            } while ( page < MaxLoops && resp.IsSuccess && resp.Data != null && resp.Data.Result != null );
+
+            // filter out non active??
+
+            return results.OrderBy( p => p.Name ).ToList();
         }
 
         /// <summary>Gets details on a specific project inclulding the top level folder</summary>
@@ -108,6 +149,35 @@ namespace Raydreams.Autodesk.CLI.Data
             string path = $"project/v1/hubs/{ids.Account.DM}/projects/{ids.Project.DM}";
 
             return await GetRequest<ForgeData>( path, true );
+        }
+
+        /// <summary>Gets a specific folder by its project ID and Folder ID</summary>
+        /// <remarks>GET (data:read) user context optional
+        /// Will return Forbidden 403 if you try to use on a folder you dont have rights to
+        /// </remarks>
+        public async Task<APIResponse<ForgeData>> GetFolderByProject( ForgeID projectID, string folderID )
+        {
+            
+            if ( !projectID.IsValid || String.IsNullOrWhiteSpace( folderID ) )
+                return new APIResponse<ForgeData>() { StatusCode = HttpStatusCode.BadRequest };
+
+            string path = $"data/v1/projects/{projectID.DM}/folders/{folderID}";
+
+            return await GetRequest<ForgeData>( path, true );
+        }
+
+        /// <summary>Get the content of a folder including child files/folders</summary>
+        /// <remarks>GET (data:read) user context optional
+        /// Will return Forbidden 403 if you try to use on a folder you dont have rights to
+        /// </remarks>
+        public async Task<APIResponse<ForgeDataCollection>> GetFolderContents( ForgeID projectID, string folderID )
+        {
+            if ( !projectID.IsValid || String.IsNullOrWhiteSpace( folderID ) )
+                return new APIResponse<ForgeDataCollection>() { StatusCode = HttpStatusCode.BadRequest };
+
+            string path = $"data/v1/projects/{projectID.DM}/folders/{folderID}/contents?includeHidden=false";
+
+            return await GetRequest<ForgeDataCollection>( path, true );
         }
 
     }
