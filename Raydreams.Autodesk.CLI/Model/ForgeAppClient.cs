@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Raydreams.Autodesk.CLI.Model
 {
-    /// <summary>Encapsulates App Client info that can be stored in the BIMrx Cloud</summary>
+    /// <summary>Encapsulates App Client info that can be stored in the</summary>
     public class ForgeAppClient
     {
         #region [ Fields ]
