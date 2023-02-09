@@ -17,7 +17,7 @@ namespace Raydreams.Autodesk.CLI.Model
         Fallback = 2,
     }
 
-    /// <summary></summary>
+    /// <summary>A download link</summary>
     public class S3SignedDownload
     {
         [JsonConverter( typeof( StringEnumConverter ) )]

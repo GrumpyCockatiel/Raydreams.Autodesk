@@ -46,29 +46,35 @@ namespace Raydreams.Autodesk.CLI
         /// <returns></returns>
         public int Run()
         {
+            // create an auth manager
             AuthenticationManager authMgr = new AuthenticationManager(this.Client);
             authMgr.Scopes = ForgeScopes.UserRead | ForgeScopes.UserProfileRead | ForgeScopes.AccountRead | ForgeScopes.DataRead;
 
+            // load the default IDs for testing
             ForgeIDs ids = new ForgeIDs( this.Client.PrimaryHubID, this.Client.DefaultProjectID );
 
-            string tokenPath = Path.Combine( IOHelpers.DesktopPath, "tokens", "autodesk.txt" );
+            // where to save the token
+            string tokenPath = Path.Combine( IOHelpers.DesktopPath, "Forge", "autodesk.txt" );
             //HTTPTokenManager tokenMgr = new HTTPTokenManager(authMgr, tokenPath, 50001);
             //tokenMgr.Writer = new FileTokenIO();
 
+            // create a 2 leg token
             ITokenManager tokenMgr = new TwoLegTokenManager(authMgr);
             //AutodeskUser user = tokenMgr.GetUser().GetAwaiter().GetResult();
 
+            // make a Data Manager Repo
             IDataManagerAPI repo = new DataManagerRepository(tokenMgr);
 
             //string? token = tokenMgr.GetTokenAsync().GetAwaiter().GetResult();
 
             // test getting all the hubs
-            this.ListHubs(repo).GetAwaiter().GetResult();
+            var hub = this.ListHubs(repo).GetAwaiter().GetResult();
 
             // test getting a project tree
             //var projects = this.ListProjects(repo, acctID).GetAwaiter().GetResult();
             var dir = this.GetProjectTree(repo, ids.Account, ids.Project );
 
+            // extract all the files from the tree
             List<ProjectFile> files = dir.Root.GetFiles();
 
             // test downloading the first file
@@ -78,10 +84,11 @@ namespace Raydreams.Autodesk.CLI
             // storage will be null if the user does not have access to DL
             var storageID = storage?.Data?.ID;
 
+            // encapsulate the IDs of the file to DL
             var obj = new ObjectIDs( storageID, files[0].Name );
 
             var dlLink = repo.GetS3DownloadLink(obj).GetAwaiter().GetResult();
-            repo.DownloadObject(dlLink.Data, Path.Combine( IOHelpers.DesktopPath, files[0].Name ) ).GetAwaiter().GetResult();
+            repo.DownloadObject(dlLink.Data, Path.Combine( IOHelpers.DesktopPath, "Forge", files[0].Name ) ).GetAwaiter().GetResult();
 
             //Console.WriteLine(token);
             return 0;
@@ -106,7 +113,7 @@ namespace Raydreams.Autodesk.CLI
             var projs = await repo.ListProjects( acctID );
 
             // write them all to a desktop file
-            DataFileWriter file = new DataFileWriter( Path.Combine(IOHelpers.DesktopPath, "projects.csv" ) ).Open();
+            DataFileWriter file = new DataFileWriter( Path.Combine(IOHelpers.DesktopPath, "Forge", "projects.csv" ) ).Open();
             file.WriteHeader(new string[] { "ID,Name,Root,Platform" });
 
             projs.ForEach( p => {
@@ -127,7 +134,7 @@ namespace Raydreams.Autodesk.CLI
             {
                 List<ProjectItem> items = proj.Project.Root.ToList(false);
 
-                DataFileWriter file = new DataFileWriter( Path.Combine( IOHelpers.DesktopPath, "files.csv" ) ).Open();
+                DataFileWriter file = new DataFileWriter( Path.Combine( IOHelpers.DesktopPath, "Forge", "files.csv" ) ).Open();
 
                 file.WriteHeader( new string[] { "ID,Name,Depth,Last Modified" } );
 

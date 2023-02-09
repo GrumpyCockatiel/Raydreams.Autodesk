@@ -24,7 +24,7 @@ namespace Raydreams.Autodesk.CLI.Data
 			if ( !ids.IsValid )
 				return new APIResponse<S3SignedDownload>() { StatusCode = HttpStatusCode.BadRequest };
 
-			string path = $"oss/v2/buckets/{ids.BucketKey}/objects/{ids.ObjectKey}/signeds3upload";
+			string path = $"oss/v2/buckets/{ids.BucketKey}/objects/{ids.ObjectKey}/signeds3download";
 
 			return await GetRequest<S3SignedDownload>( path, true );
 		}
@@ -86,7 +86,7 @@ namespace Raydreams.Autodesk.CLI.Data
 			if ( !ids.IsValid )
 				return new APIResponse<S3SignedUpload>() { StatusCode = HttpStatusCode.BadRequest };
 
-			string path = $"oss/v2/buckets/{ids.BucketKey}/objects/{ids.ObjectKey}/signeds3download";
+			string path = $"oss/v2/buckets/{ids.BucketKey}/objects/{ids.ObjectKey}/signeds3upload";
 
 			return await GetRequest<S3SignedUpload>( path, true );
 		}
