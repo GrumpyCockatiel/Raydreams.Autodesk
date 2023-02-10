@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Raydreams.Autodesk.CLI.Data
 {
-    /// <summary></summary>
+    /// <summary>Concrete implementation for interacting with the Data Manager APIs</summary>
     public partial class DataManagerRepository : IDataManagerAPI
     {
         #region [ Fields ]

@@ -19,6 +19,7 @@ namespace Raydreams.Autodesk.CLI
         {
             Console.WriteLine("Starting...");
 
+            // check if running on macOS
             bool isMac = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
             // get the environment var
@@ -47,9 +48,10 @@ namespace Raydreams.Autodesk.CLI
                 services.AddOptions();
 
                 // get the app config file
-                //services.AddScoped<AppConfig>(p => {
-                //    return ctx.Configuration.GetSection("AppConfig").Get<AppConfig>();
-                //});
+                //services.AddScoped<AppConfig>( p =>
+                //{
+                //    return ctx.Configuration.GetSection( "AppConfig" ).Get<AppConfig>();
+                //} );
 
                 // add the App Client Info
                 services.AddScoped<ForgeAppClient>(p => {

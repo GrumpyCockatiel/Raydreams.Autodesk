@@ -3,7 +3,7 @@ using Raydreams.Autodesk.CLI.Model;
 
 namespace Raydreams.Autodesk.CLI.Data
 {
-    /// <summary></summary>
+    /// <summary>The interface for interacting with the Data Manager APIs</summary>
     public interface IDataManagerAPI
     {
         /// <summary></summary>
