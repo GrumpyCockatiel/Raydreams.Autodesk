@@ -2,9 +2,9 @@
 using System;
 using System.IO;
 using System.Net;
-using Raydreams.Autodesk.CLI.Model;
+using Raydreams.Autodesk.Model;
 using Raydreams.Web;
-using Raydreams.Autodesk.CLI.IO;
+using Raydreams.Autodesk.IO;
 
 namespace Raydreams.Autodesk.CLI.Web
 {

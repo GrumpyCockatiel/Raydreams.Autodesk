@@ -3,10 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Raydreams.Autodesk.CLI.Data;
-using Raydreams.Autodesk.CLI.IO;
-using Raydreams.Autodesk.CLI.Model;
-using Raydreams.Autodesk.CLI.Security;
+using Raydreams.Autodesk.Data;
+using Raydreams.Autodesk.IO;
+using Raydreams.Autodesk.Model;
+using Raydreams.Autodesk.Security;
 
 namespace Raydreams.Autodesk.CLI
 {

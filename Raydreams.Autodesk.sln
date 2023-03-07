@@ -5,6 +5,12 @@ VisualStudioVersion = 25.0.1704.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raydreams.Autodesk.CLI", "Raydreams.Autodesk.CLI\Raydreams.Autodesk.CLI.csproj", "{EB601DDF-D786-4997-81B7-8381D7BFDF3B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raydreams.Autodesk", "Raydreams.Autodesk\Raydreams.Autodesk.csproj", "{C16978F1-C4B6-4CF2-9C39-29E07C001CC9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{EFD166FE-4420-4E3C-B476-5389D5B3D228}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raydreams.Autodesk.Tests", "Raydreams.Autodesk.Tests\Raydreams.Autodesk.Tests.csproj", "{EB4E61BB-76BB-4A5E-B727-C88C934EA187}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,11 +21,22 @@ Global
 		{EB601DDF-D786-4997-81B7-8381D7BFDF3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB601DDF-D786-4997-81B7-8381D7BFDF3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB601DDF-D786-4997-81B7-8381D7BFDF3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C16978F1-C4B6-4CF2-9C39-29E07C001CC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C16978F1-C4B6-4CF2-9C39-29E07C001CC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C16978F1-C4B6-4CF2-9C39-29E07C001CC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C16978F1-C4B6-4CF2-9C39-29E07C001CC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB4E61BB-76BB-4A5E-B727-C88C934EA187}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB4E61BB-76BB-4A5E-B727-C88C934EA187}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB4E61BB-76BB-4A5E-B727-C88C934EA187}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB4E61BB-76BB-4A5E-B727-C88C934EA187}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FF3A1C9F-2814-4F5E-8644-7EFD923720C4}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EB4E61BB-76BB-4A5E-B727-C88C934EA187} = {EFD166FE-4420-4E3C-B476-5389D5B3D228}
 	EndGlobalSection
 EndGlobal

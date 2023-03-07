@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Raydreams.Autodesk.CLI.IO;
-using Raydreams.Autodesk.CLI.Model;
+using Raydreams.Autodesk.IO;
+using Raydreams.Autodesk.Model;
 using Raydreams.Autodesk.CLI.Web;
+using Raydreams.Autodesk.Security;
 
 namespace Raydreams.Autodesk.CLI.Security
 {

@@ -9,13 +9,8 @@
 
   <ItemGroup>
     <None Remove="Newtonsoft.Json" />
-    <None Remove="Model\" />
-    <None Remove="Logic\" />
-    <None Remove="Extensions\" />
     <None Remove="raydreams.miniserver" />
-    <None Remove="Data\" />
     <None Remove="CommandLineParser" />
-    <None Remove="Serializers\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
@@ -28,18 +23,14 @@
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Model\" />
-    <Folder Include="Logic\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Data\" />
-    <Folder Include="Serializers\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Update="appsettings.Development.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Raydreams.Autodesk\Raydreams.Autodesk.csproj" />
   </ItemGroup>
 </Project>
