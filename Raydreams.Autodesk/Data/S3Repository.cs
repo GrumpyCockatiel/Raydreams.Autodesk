@@ -122,54 +122,7 @@ namespace Raydreams.Autodesk.Data
             return await PostRequest<ForgeData>( path, body, true );
         }
 
-        /// <summary>Puts a local file on S3</summary>
-        /// <param name="file"></param>
-        /// <param name="uploadURL"></param>
-        /// <returns></returns>
-        public async Task<APIResponse<bool>> PutObject( RawFileWrapper file, string uploadURL )
-		{
-			HttpRequestMessage message = new HttpRequestMessage( HttpMethod.Put, $"{uploadURL}" );
-			message.Headers.Clear();
-
-			// read the file into memory which is limited to 2 GB, otherwise really should chunk the uploads
-
-			// add the file body
-			message.Content = new ByteArrayContent( file.Data );
-			message.Content.Headers.ContentLength = file.Data.Length;
-
-			// set MIME Type - careful any spaces will mess it up
-			message.Content.Headers.ContentType = new MediaTypeHeaderValue( file.ContentType.Trim() );
-
-			// create a reponse object
-			APIResponse<bool> results = new APIResponse<bool>();
-
-			try
-			{
-				using HttpClient client = new HttpClient() { Timeout = this.DownloadTimeout };
-
-				// make the request async
-				using var cts = new CancellationTokenSource( this.DownloadTimeout );
-				HttpResponseMessage httpResponse = await client.SendAsync( message, cts.Token );
-
-				// set the reponse
-				results.StatusCode = httpResponse.StatusCode;
-				string rawResponse = await httpResponse.Content.ReadAsStringAsync();
-
-				// deserialize the response
-				results.Data = results.StatusCode == HttpStatusCode.OK;
-			}
-			catch ( HttpRequestException exp )
-			{
-				throw exp;
-			}
-			catch ( System.Exception exp )
-			{
-                // timeouts throw - System.threading.tasks.TaskCanceledException
-                results.Exception = exp;
-            }
-
-			return results;
-		}
+        
 
 		#endregion [ S3 Upload ]
 	}

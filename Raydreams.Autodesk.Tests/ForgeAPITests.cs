@@ -101,7 +101,7 @@ public class ForgeAPITests
             // populate a new request item
             CreateStorageRequest item = new CreateStorageRequest( input.Filename, files[0].ID );
 
-            // create a new storage location
+            // create a new storage location - POST
             APIResponse<ForgeData> meta = this.Repo.InsertStorage( this.IDs.Project, item ).Result;
 
             // parse the IDs
