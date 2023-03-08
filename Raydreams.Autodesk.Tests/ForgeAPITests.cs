@@ -24,7 +24,7 @@ public class ForgeAPITests
     public void Initialize()
     {
         AuthenticationManager authMgr = new AuthenticationManager( Config.AppClient );
-        authMgr.Scopes = ForgeScopes.UserRead | ForgeScopes.UserProfileRead | ForgeScopes.AccountRead | ForgeScopes.DataRead;
+        authMgr.Scopes = ForgeScopes.UserRead | ForgeScopes.UserProfileRead | ForgeScopes.AccountRead | ForgeScopes.DataRead | ForgeScopes.DataWrite | ForgeScopes.AccountWrite | ForgeScopes.DataCreate;
 
         // create a 2 leg token
         ITokenManager tokenMgr = new TwoLegTokenManager( authMgr );
@@ -44,24 +44,89 @@ public class ForgeAPITests
     [TestMethod]
     public void ListHubsTest()
     {
-        var hubs = this.Repo.ListHubs().Result;
+        var results = this.Repo.ListHubs().Result;
 
-        Assert.IsNotNull(hubs);
+        Assert.IsNotNull( results );
     }
 
-    /// <summary>Test to list all hubs the client can access</summary>
+    /// <summary></summary>
+    [TestMethod]
+    public void ListProjectsTest()
+    {
+        var results = this.Repo.ListProjects( this.IDs.Account ).Result;
+
+        Assert.IsNotNull( results );
+        Assert.IsTrue( results.Count > 0 );
+    }
+
+    /// <summary></summary>
     [TestMethod]
     public void ListFilesTest()
     {
         List<ProjectItem> results = new List<ProjectItem>(); 
 
         ProjectBuilder proj = new ProjectBuilder( this.Repo );
-        var built = proj.Build( this.IDs ).Result;
+        bool built = proj.Build( this.IDs ).Result;
 
         if ( built )
             results = proj.Project.Root.ToList( false );
         
         Assert.IsNotNull( results );
         Assert.IsTrue( results.Count > 0 );
+    }
+
+    /// <summary>The end to end process to upload a version 1 file to a project</summary>
+    [TestMethod]
+    public void UploadFileTest()
+    {
+        RawFileWrapper input = new RawFileWrapper();
+
+        APIResponse<ForgeData> verRes = null;
+
+        try
+        {
+
+            // read a local binary file
+            input.Data = File.ReadAllBytes( Path.Combine( DesktopPath, "TestImages", "volvox.jpg" ) );
+            input.Filename = "volvox.jpg";
+            input.ContentType = "image/jpg";
+
+            // need a folder ID and a filename
+            ProjectBuilder proj = new ProjectBuilder( this.Repo );
+            bool built = proj.Build( this.IDs ).Result;
+
+            // get the folder to upload to
+            var files = proj.Project.Root.FindByName( "Test Files" );
+
+            // populate a new request item
+            CreateStorageRequest item = new CreateStorageRequest( input.Filename, files[0].ID );
+
+            // create a new storage location
+            APIResponse<ForgeData> meta = this.Repo.InsertStorage( this.IDs.Project, item ).Result;
+
+            // parse the IDs
+            ObjectIDs ids = new ObjectIDs( meta.Data.Result.ID );
+
+            // get an upload link - STEP 4
+            APIResponse<S3SignedUpload> s3Url = this.Repo.GetS3UploadLink( ids ).Result;
+
+            // now upload the bytes themselves - STEP 5
+            APIResponse<bool> results = this.Repo.PutObject( input, s3Url.Data.URLs[0] ).Result;
+
+            // now complete the upload - STEP 6
+            var complete = this.Repo.PostS3Upload( ids, s3Url.Data.UploadKey ).Result;
+
+            // finally create the first version - STEP 7
+            InsertItemRequest ver1 = new InsertItemRequest( input.Filename, files[0].ID, complete.Data.ObjectID );
+
+            // now insert version 1
+            verRes = this.Repo.InsertItem( this.IDs.Project, ver1 ).Result;
+        }
+        catch ( Exception exp )
+        {
+            _ = 5;
+        }
+
+        Assert.IsTrue( verRes?.IsSuccess );
     }
 }

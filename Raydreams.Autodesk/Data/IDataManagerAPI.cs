@@ -28,6 +28,9 @@ namespace Raydreams.Autodesk.Data
         Task<APIResponse<ForgeData>> GetItemMetadata(ForgeID projectID, string itemID);
 
         /// <summary></summary>
+        Task<APIResponse<ForgeData>> InsertStorage( ForgeID projectID, CreateStorageRequest item );
+
+        /// <summary></summary>
         Task<APIResponse<S3SignedDownload>> GetS3DownloadLink(ObjectIDs ids);
 
         /// <summary></summary>
@@ -35,5 +38,14 @@ namespace Raydreams.Autodesk.Data
 
         /// <summary></summary>
         Task<APIResponse<S3SignedUpload>> GetS3UploadLink(ObjectIDs ids);
+
+        /// <summary></summary>
+        Task<APIResponse<bool>> PutObject( RawFileWrapper file, string uploadURL );
+
+        /// <summary></summary>
+        Task<APIResponse<S3SignedUploadComplete>> PostS3Upload( ObjectIDs ids, string uploadKey );
+
+        /// <summary></summary>
+        Task<APIResponse<ForgeData>> InsertItem( ForgeID projectID, InsertItemRequest item );
     }
 }

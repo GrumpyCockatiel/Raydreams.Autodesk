@@ -109,7 +109,6 @@ namespace Raydreams.Autodesk.CLI
         /// <summary>Downloads directly to the file system and returns the metadata</summary>
         /// <param name="repo">DM repo to use</param>
         /// <param name="ids">Bucket and object key</param>
-        /// <param name="itemID"></param>
         /// <returns></returns>
         protected async Task<RawFileWrapper> DownloadFile( IDataManagerAPI repo, ObjectIDs ids )
         {

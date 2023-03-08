@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Raydreams.Autodesk.Model;
 using System.Net.Http.Headers;
+using System.Text;
 
 namespace Raydreams.Autodesk.Data
 {
@@ -88,6 +89,57 @@ namespace Raydreams.Autodesk.Data
 
             return results;
         }
+
+        /// <summary></summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <param name="body"></param>
+        /// <param name="authenticate"></param>
+        /// <returns></returns>
+        protected async Task<APIResponse<T>> PostRequest<T>( string path, string body, bool authenticate )
+        {
+            APIResponse<T> results = new APIResponse<T>();
+
+            if ( String.IsNullOrWhiteSpace( path ) )
+                return results;
+
+            HttpRequestMessage message = new HttpRequestMessage( HttpMethod.Post, $"{TenantBase}/{path}" );
+            message.Headers.Clear();
+
+            // check for an existing token
+            if ( authenticate )
+                message.Headers.Authorization = new AuthenticationHeaderValue( "Bearer", await this.Token() );
+
+            // TODO - Need the user ID here
+            if ( this.IsXUser )
+                message.Headers.Add( XUserIDField, "" );
+
+            // add the body
+            message.Content = new StringContent( body, Encoding.UTF8 );
+            byte[] bytes = Encoding.UTF8.GetBytes( body );
+            message.Content.Headers.ContentLength = bytes.Length;
+            message.Content.Headers.ContentType = new MediaTypeHeaderValue( "application/vnd.api+json" );
+
+            try
+            {
+                using HttpClient client = new HttpClient();
+                HttpResponseMessage httpResponse = await client.SendAsync( message );
+
+                results.StatusCode = httpResponse.StatusCode;
+                string rawResponse = await httpResponse.Content.ReadAsStringAsync();
+
+                // deserialize the response
+                results.Data = JsonConvert.DeserializeObject<T>( rawResponse );
+            }
+            catch ( System.Exception exp )
+            {
+                results.Exception = exp;
+                return results;
+            }
+
+            return results;
+        }
+
     }
 }
 

@@ -91,11 +91,42 @@ namespace Raydreams.Autodesk.Data
 			return await GetRequest<S3SignedUpload>( path, true );
 		}
 
-		/// <summary>Puts a local file on S3</summary>
-		/// <param name="file"></param>
-		/// <param name="uploadURL"></param>
-		/// <returns></returns>
-		public async Task<APIResponse<bool>> PutObject( RawFileWrapper file, string uploadURL )
+        /// <summary>Complete an upload</summary>
+        /// <remarks>POST (data:write data:create) user context optional</remarks>
+        public async Task<APIResponse<S3SignedUploadComplete>> PostS3Upload( ObjectIDs ids, string uploadKey )
+        {
+            if ( !ids.IsValid || String.IsNullOrWhiteSpace(uploadKey) )
+                return new APIResponse<S3SignedUploadComplete>() { StatusCode = HttpStatusCode.BadRequest };
+
+            string path = $"oss/v2/buckets/{ids.BucketKey}/objects/{ids.ObjectKey}/signeds3upload";
+
+			// get the body
+			string body = $"{{\"uploadKey\":\"{uploadKey}\"}}";
+
+            return await PostRequest<S3SignedUploadComplete>( path, body, true );
+        }
+
+        /// <summary>Creates the first version of a file (item).
+        /// To create additional versions of an item, use POST versions (InsertVersion func).</summary>
+        /// <remarks>POST (data:create) user context optional</remarks>
+        public async Task<APIResponse<ForgeData>> InsertItem( ForgeID projectID, InsertItemRequest item )
+        {
+			if ( !projectID.IsValid )
+                return new APIResponse<ForgeData>() { StatusCode = HttpStatusCode.BadRequest };
+
+            string path = $"data/v1/projects/{projectID.DM}/items";
+
+            // get the body
+            string body = JsonConvert.SerializeObject( item );
+
+            return await PostRequest<ForgeData>( path, body, true );
+        }
+
+        /// <summary>Puts a local file on S3</summary>
+        /// <param name="file"></param>
+        /// <param name="uploadURL"></param>
+        /// <returns></returns>
+        public async Task<APIResponse<bool>> PutObject( RawFileWrapper file, string uploadURL )
 		{
 			HttpRequestMessage message = new HttpRequestMessage( HttpMethod.Put, $"{uploadURL}" );
 			message.Headers.Clear();

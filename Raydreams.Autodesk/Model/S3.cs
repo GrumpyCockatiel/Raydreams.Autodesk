@@ -56,6 +56,7 @@ namespace Raydreams.Autodesk.Model
     /// <summary></summary>
     public class S3SignedUpload
     {
+        /// <summary>Need this to complete the upload</summary>
         [JsonProperty( "uploadKey" )]
         public string UploadKey { get; set; }
 
@@ -69,5 +70,29 @@ namespace Raydreams.Autodesk.Model
         public List<string> URLs { get; set; }
     }
 
-}
+    /// <summary></summary>
+    public class S3SignedUploadComplete
+    {
+        /// <summary></summary>
+        [JsonProperty( "bucketKey" )]
+        public string BucketKey { get; set; }
 
+        /// <summary></summary>
+        [JsonProperty( "objectId" )]
+        public string ObjectID { get; set; }
+
+        /// <summary></summary>
+        [JsonProperty( "objectKey" )]
+        public string ObjectKey { get; set; }
+
+        [JsonProperty( "content-type" )]
+        public string ContentType { get; set; }
+
+        [JsonProperty( "size" )]
+        public long Size { get; set; } = 0;
+
+        [JsonProperty( "location" )]
+        public string Location { get; set; }
+    }
+
+}

@@ -202,6 +202,23 @@ namespace Raydreams.Autodesk.Data
             return await GetRequest<ForgeData>(path, true);
         }
 
+        /// <summary>Creates a storage location in the OSS where data can be uploaded to. Used with uploading a file.</summary>
+        /// <param name="projectID"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        /// <remarks>POST (data:create) user context optional</remarks>
+        public async Task<APIResponse<ForgeData>> InsertStorage( ForgeID projectID, CreateStorageRequest item )
+        {
+            if ( !projectID.IsValid )
+                return new APIResponse<ForgeData>() { StatusCode = HttpStatusCode.BadRequest };
+
+            string path = $"data/v1/projects/{projectID.DM}/storage";
+
+            string body = JsonConvert.SerializeObject( item );
+
+            return await PostRequest<ForgeData>( path, body, true );
+        }
+
     }
 }
 

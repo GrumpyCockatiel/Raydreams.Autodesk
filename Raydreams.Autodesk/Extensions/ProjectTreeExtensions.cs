@@ -108,7 +108,7 @@ namespace Raydreams.Autodesk.Extensions
         /// <param name="start"></param>
         /// <param name="itemID"></param>
         /// <returns></returns>
-        public static ProjectItem FindByID( ProjectFolder start, string itemID )
+        public static ProjectItem? FindByID( ProjectFolder start, string itemID )
 		{
             if ( String.IsNullOrWhiteSpace( itemID ) )
                 return null;
@@ -124,6 +124,30 @@ namespace Raydreams.Autodesk.Extensions
             }
 
             return null;
+        }
+
+        /// <summary>Recurses a directory tree looking for items with the specified EXACT name match</summary>
+        /// <param name="start"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static List<ProjectItem> FindByName( this ProjectFolder start, string name )
+        {
+            List<ProjectItem> results = new List<ProjectItem>();
+
+            if ( String.IsNullOrWhiteSpace( name ) )
+                return results;
+
+            name = name.Trim();
+
+            var enu = Preorder( start ).GetEnumerator();
+
+            while ( enu.MoveNext() )
+            {
+                if ( enu.Current.Name.Equals( name ) )
+                    results.Add( enu.Current );
+            }
+
+            return results;
         }
 
         /// <summary>Flattens a project into a simple list of all the project items using a level walk</summary>
