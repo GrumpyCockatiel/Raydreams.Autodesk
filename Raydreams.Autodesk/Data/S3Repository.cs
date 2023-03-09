@@ -122,8 +122,6 @@ namespace Raydreams.Autodesk.Data
             return await PostRequest<ForgeData>( path, body, true );
         }
 
-        
-
 		#endregion [ S3 Upload ]
 	}
 }

@@ -76,6 +76,7 @@ public class ForgeAPITests
     }
 
     /// <summary>The end to end process to upload a version 1 file to a project</summary>
+    /// <remarks>Roll all these steps into a logic class</remarks>
     [TestMethod]
     public void UploadFileTest()
     {
@@ -118,15 +119,14 @@ public class ForgeAPITests
 
             // finally create the first version - STEP 7
             InsertItemRequest ver1 = new InsertItemRequest( input.Filename, files[0].ID, complete.Data.ObjectID );
-
-            // now insert version 1
             verRes = this.Repo.InsertItem( this.IDs.Project, ver1 ).Result;
         }
         catch ( Exception exp )
         {
-            _ = 5;
+            Assert.Fail(exp.Message);
         }
 
         Assert.IsTrue( verRes?.IsSuccess );
     }
+
 }

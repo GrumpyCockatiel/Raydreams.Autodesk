@@ -13,9 +13,6 @@ appsettings.Development*.json
 *.user
 *.userosscache
 *.sln.docstates
-Microdesk.CloudManager.Exe/
-Microdesk.CloudManager.Common/
-Microdesk.CloudManager.Client/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
